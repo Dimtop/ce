@@ -1,0 +1,76 @@
+html,body,#root{
+    width: 100%;
+    height: 100%;
+    padding:0;
+    margin:0;
+    overflow-x: hidden;
+    background-color: #fae3cd;
+}
+
+*{
+    font-family: "Verdana";
+}
+
+.lightText{
+    color:#9c8a79;
+}
+
+.whiteText{
+    color:white;
+}
+
+.centeredText{
+    text-align: center;
+}
+
+#appLogoText{
+    font-size: 3rem;
+}
+
+.fullCenteredContainer{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-items: center;
+}
+
+
+.mainButton{
+    width:15rem!important;
+    margin-top: 1rem;
+}
+.mainInput{
+    width:15rem!important;
+}
+
+
+.machineButton{
+    width:100%;
+}
+
+.mainIcon{
+    font-size: 2rem!important;
+    margin:1rem;
+}
+
+#header{
+    display: grid;
+    align-items: center;
+    position: fixed;
+    top:0;
+    left:0;
+    grid-template-columns: 1fr 1fr;
+    padding:1rem;
+    background-color: #9c8a79;
+    width:100%;
+}
+#header>.left{
+    display: grid;
+    justify-items: start;
+}
+#header>.right{
+    display: grid;
+    justify-items: end;
+}
