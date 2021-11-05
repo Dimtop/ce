@@ -1,15 +1,20 @@
 import React from 'react'
 
 
+//Components
+import {Heading,Strong,Link} from "evergreen-ui"
+
+
 
 export default function AppLogo(){
 
 
     return(
-        <>
-        <h1 id="appLogoText" className="lightText centeredText">Pavlos Topalidis<br></br>CE Platform</h1>
-        <h2 className="lightText centeredText"><a href="https://topcode.gr" target="_blank">by Topcode</a></h2>
-        </>
+        <div id="appLogo">
+            <Heading size="900" >Pavlos Topalidis CE Platform</Heading>
+            <Link href="https://topcode.gr" target="_blank" color="white" textDecoration="none" fontSize="2rem" marginTop="2rem">by Topcode</Link>
+
+        </div>
     
     )
 }

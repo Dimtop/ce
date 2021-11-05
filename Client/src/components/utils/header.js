@@ -1,14 +1,15 @@
 import React,{useState,useEffect} from 'react'
 
 //Icons
-import MenuIcon from '@rsuite/icons/Menu';
+
 //Components
 import {Drawer,Button} from "rsuite"
+import {Pane,Heading,MenuIcon,IconButton } from "evergreen-ui"
 import MenuDrawer from "./menuDrawer"
 
 export default function Header(props){
 
-    const [showMenu,setShowMenu] = useState(true)
+    const [showMenu,setShowMenu] = useState(false)
 
 
     return(
@@ -16,21 +17,14 @@ export default function Header(props){
      
 
         <div id="header">
-        
-            <div className="left">
-                <h3 className="whiteText">Pavlos Topalidis CE Platform</h3>
-            </div>
-            <div  className="right">
-                <Button appearance="primary" size="xs" onClick={()=>{
-                    setShowMenu(!showMenu)
-                }}>
-                    <MenuIcon className="mainIcon whiteText"/>
-                </Button>
-          
-            </div>
-           
+            <Pane  style={{width:"100%",height:"100%"}} display="flex" alignItems="center" justifyContent="start" border="none">
+            <IconButton icon={MenuIcon} marginRight="2rem" onClick={()=>setShowMenu(true)}/> 
+            <Heading size="500" >Pavlos Topalidis CE Platform</Heading>
+            </Pane>
+
         </div>
-           <MenuDrawer showMenu={showMenu} setShowMenu={setShowMenu}/>
+        <MenuDrawer showMenu={showMenu} setShowMenu={setShowMenu}/>
+           
         </>
     )
 }

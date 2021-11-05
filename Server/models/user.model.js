@@ -12,6 +12,30 @@ const userSchema = new mongoose.Schema({
     password: {
         type:String,
         required:[true,"The password is required."]
+    },
+    bussinesName:{
+        type:String
+    },
+    AFM:{
+        type:String
+    },
+    DOI:{
+        type:String
+    },
+    address:{
+        type:String
+    },
+    phone:{
+        type:String
+    },
+    email:{
+        type:String
+    },
+    logo:{
+        type:String
+    },
+    signature:{
+        type:String
     }
   
 });

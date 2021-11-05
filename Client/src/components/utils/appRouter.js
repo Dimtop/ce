@@ -5,6 +5,7 @@ import AppLogo from './appLogo';
 import Login from "./login"
 import Dashboard from "./dashboard"
 import Header from "./header"
+import Account from "../account"
 
 import {
     BrowserRouter as Router,
@@ -42,7 +43,7 @@ export default function AppRouter(props){
                             </>
                             :
                             <>
-                                <h1>Logged</h1>
+                                <Redirect to="/dashboard"/>
                             </>
                         }
                     </Route>
@@ -52,6 +53,17 @@ export default function AppRouter(props){
                         <>
                         <Header/>
                         <Dashboard />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/account">
+                        {
+                        auth?
+                        <>
+                        <Header/>
+                        <Account />
                         </>
                         :
                         <Redirect to="/"/>

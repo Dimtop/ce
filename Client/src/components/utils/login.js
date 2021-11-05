@@ -1,10 +1,10 @@
 import React, {useState,useEffect} from 'react'
 
-//Components
-import {Button,Input,Grid,Row,Col,Alert} from 'rsuite'
+
 
 //Libraries
 import Cookies from "js-cookie"
+import { TextInputField,Button,toaster} from 'evergreen-ui';
 
 export default function Login(props){
 
@@ -15,12 +15,24 @@ export default function Login(props){
 
     return(
         <>
-        <div>
-            <p>Username</p>
-            <Input className="mainInput" type='text' value={username} onChange={value=>setUsername(value)}/>
-            <p>Password</p>
-            <Input className="mainInput" type='password' value={password} onChange={value=>setPassword(value)}/>
-            <Button appearance="primary" className="mainButton" onClick={()=>{
+        <div id="loginForm">
+            <TextInputField 
+              label="Username"
+              type="text"
+              placeholder="Please enter your username"
+              color="white"
+              value={username}
+              onChange={e=>setUsername(e.target.value)}
+            />
+              <TextInputField 
+              label="Password"
+                type="password"
+              placeholder="Please enter your password"
+              color="white"
+              value={password}
+              onChange={e=>setPassword(e.target.value)}
+            />
+            <Button onClick={()=>{
                 fetch("/api/users/authenticate",{
                     method:"post",
                     headers:{
@@ -37,11 +49,11 @@ export default function Login(props){
                 .then(res=>{
                     console.log(res)
                     if(res.error){
-                        Alert.error(res.error)
+                        toaster.danger(res.error)
                         return;
                     }
                     if(!res.error && !res.success){
-                        Alert.error("There was an error.")
+                        toaster.danger("There was an error.")
                         return;
                     }
                     
@@ -49,6 +61,7 @@ export default function Login(props){
                     location.replace("/dashboard")
                 })
             }}>Login</Button>
+           
         </div>
 
         

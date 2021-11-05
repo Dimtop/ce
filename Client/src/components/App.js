@@ -2,7 +2,7 @@ import React,{useState,useEffect} from 'react';
 
 //Styles
 import "../styles/main.style.css"
-import "../styles/main.style.less"
+
 
 
 //Components
@@ -17,9 +17,9 @@ export default function App(props){
 
     return(
         <>
-            <div className="fullCenteredContainer">
+        
                 <AppRouter />
-            </div>
+        
         </>
     )
 }
