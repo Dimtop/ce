@@ -3,8 +3,11 @@ const machineModel = require("../models/machine.model")
 const path = require("path")
 const fs = require("fs")
 
-var Dropbox = require('dropbox').Dropbox;
-var dbx = new Dropbox({ accessToken: 'Z44ADUd1HbsAAAAAAAAAAZEteQWMCoJm5zOniIaajpRwjCenopvF5XV5Vz48vw5n' });
+//Services
+
+const UserFolderService = require("../services/userFolderService");
+
+
 exports.authenticateUser = async(req,res)=>{
     
     var user = await userModel.findOne({username:req.body.username});
@@ -46,33 +49,46 @@ exports.getUserByID = async(req,res)=>{
 
 
 exports.updateUser = async(req,res)=>{
-    console.log(req.body.user)
+    var user = JSON.parse(req.body.user);
+    console.log(user._id)
+
+
+    //Manage user filesystem
+    var userFolderService = new UserFolderService(user._id);
+    var fsRes = userFolderService.createUserFilesystem();
+    if(fsRes.error){
+        res.status(400).send({error:fsRes.error})
+        return
+    }
+
+
+    //Manage req images
+    var logo = req.files?req.files.logo:null;
+    var signature = req.files?req.files.signature:null;
+
+    if(logo){
+
+        logo.mv(userFolderService.userAccountFolder + "/" + logo.name);
+        user.logo = process.env.FILE_PATH +  "/"  + user._id + "/account" + "/" + logo.name;
+    }
+
+    if(signature){
+
+        signature.mv(userFolderService.userAccountFolder + "/" + signature.name);
+        user.signature = process.env.FILE_PATH +  "/"  + user._id + "/account" + "/" + signature.name;
+    }
+
     try{
-        await userModel.updateOne({_id:req.params.userID},req.body.user);
+        await userModel.updateOne({_id:req.params.userID},user);
     }
     catch(error){
         res.status(400).send({error:"Something went wrong."})
         return;
     }
 
-    dbx.filesListFolder({path: '/My PC (LAPTOP-GT9MC1SQ)/documents'})
-    .then(function(response) {
-      console.log(response.result.entries);
-    })
-    
-    .catch(function(error) {
-      console.log(error);
-    });
 
+   
 
-    dbx.filesUpload({path: '/My PC (LAPTOP-GT9MC1SQ)/documents/test.pdf', contents: fs.readFileSync(path.join(__dirname,"../test.pdf"))})
-    .then(function(response) {
-        console.log(response)
-    })
-    .catch(function(error) {
-      console.error(error);
-    });
-
-
+   
     res.status(200).send({success:"The user was successfully updated."})
 }

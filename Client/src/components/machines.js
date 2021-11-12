@@ -23,7 +23,7 @@ export default function Machines(){
     useEffect(()=>{
         getUserMachines(Cookies.get("authID"),(data)=>{
             console.log(data)
-            data.machines = [...data.machines,...data.machines,...data.machines,...data.machines,...data.machines]
+           // data.machines = [...data.machines,...data.machines,...data.machines,...data.machines,...data.machines]
             setMachines(data.machines);
             setShowSpinner(false)
         })
@@ -64,6 +64,7 @@ export default function Machines(){
                               background="tint1"
                               cursor="pointer"
                               hoverElevation={2}
+                              onClick={()=>location.replace("/machines/" + machine._id + "/fileTypes")}
                             >
                                 <Text>{machine.name}</Text>
                                 <Text size={300}>{machine.type}</Text>

@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:[true,"The password is required."]
     },
+    isAdmin:{
+        type:Boolean
+    },
     bussinesName:{
         type:String
     },

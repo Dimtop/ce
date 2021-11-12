@@ -97,6 +97,7 @@ export default function Account(props){
             <img src={tmpLogo?tmpLogo:user.logo} className="thumbnail" /> 
              <FilePicker
                 className="withMarginTop" 
+                name="logo"
                 placeholder="Επιλέξτε την υπογραφή σας"
                 onChange={(file)=>{
                     console.log(file)

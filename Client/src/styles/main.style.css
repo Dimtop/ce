@@ -123,3 +123,7 @@ p{
     width: 10rem;
     height: 5rem;
 }
+
+.react-datepicker__input-container>input{
+    width: 100%!important;
+}

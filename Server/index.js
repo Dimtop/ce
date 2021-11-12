@@ -12,6 +12,8 @@ const dbConnect = require('./Middlewares/dbConnect');
 
 //Routers
 const userRouter = require("./routers/user.router")
+const machineRouter =require("./routers/machine.router")
+const messageRouter = require("./routers/message.router")
 
 //Initiallizing the app
 const app = express();
@@ -26,6 +28,8 @@ app.use(express.urlencoded({extended:false}));
 app.use(bodyParser.json());
 app.use(fileUpload());
 
+app.use(express.static(path.join(__dirname,"files")))
+
 //Static files
 //app.use(express.static("Media"));
 //app.use(express.static("Public"));
@@ -36,7 +40,10 @@ app.use(fileUpload());
 })*/
 
 //Routing
+
 app.use("/api/users",userRouter)
+app.use("/api/machines",machineRouter)
+app.use("/api/messages",messageRouter)
 
 
 //Initializing the server
