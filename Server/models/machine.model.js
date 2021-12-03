@@ -15,6 +15,9 @@ const machineSchema = new mongoose.Schema({
     userID:{
         type:String
     },
+    serialNumber:{
+        type:String
+    },
     fixedFiles:{
         safetyList:{
             links:[]
@@ -68,22 +71,58 @@ const machineSchema = new mongoose.Schema({
                 productionManager:{
                     type:String
                 }
+            },
+            fileCode:{
+                type:String
             }
         },
         production:{
             data:{
+                orderNumber:{
+                    type:String
+                },
+                quantity:{
+                    type:Number
+                },
+                jobs:{
+                    cuts:{
+                        name:{
+                            type:String
+                        },
+                        date:{
+                            type:Date
+                        }
+                    },
+                    soldering:{
+                        name:{
+                            type:String
+                        },
+                        date:{
+                            type:Date
+                        }
+                    },
+                    modding:{
+                        name:{
+                            type:String
+                        },
+                        date:{
+                            type:Date
+                        }
+                    }
+                },
                 serialNumber:{
                     type:String
                 },
-                issueDate:{
+                startDate:{
                     type:Date
                 },
-                productionDate:{
-                    type:Date
-                },
+               
                 productionManager:{
                     type:String
                 }
+            },
+            fileCode:{
+                type:String
             }
         },
         partsList:{
@@ -114,6 +153,9 @@ const machineSchema = new mongoose.Schema({
                         type:String
                     }
                 }]
+            },
+            fileCode:{
+                type:String
             }
         },
         declarationOfCompliance:{
@@ -130,6 +172,9 @@ const machineSchema = new mongoose.Schema({
                 productionManager:{
                     type:String
                 }
+            },
+            fileCode:{
+                type:String
             }
         }
     }

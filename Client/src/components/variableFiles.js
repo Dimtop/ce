@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from "react";
 
 //Helpers
-import {getMachineByID} from "../helpers/dataManager"
+import {getMachineByID,updateMachineFiles} from "../helpers/dataManager"
 import getFileNameFromURL from "../helpers/getFileNameFromURL"
 import getObjectPropertySafe from "../helpers/getObjectPropertySafe"
 
@@ -47,6 +47,7 @@ export default function VariableFiles(props){
                 toaster.danger(error);
                 return;
             }
+            console.log(res.data.machine)
             setMachine(res.data.machine);
             setShowSpinner(false)
         })
@@ -110,8 +111,19 @@ export default function VariableFiles(props){
                                   
                                         <Pane width="20rem" display="flex" flexDirection="column" justifyContent="center" alignItems="center" textAlign="center" justifyItems="center">
                                             <Pane width="100%" marginBottom="2rem">
-                                                <Button intent="success" width="20rem">Αποθήκευση</Button>
-                                                <Button intent="info" width="20rem" marginTop="1rem">Εκτύπωση αρχείου</Button>
+                                                <Button intent="success" width="20rem" onClick={()=>{
+                                                    updateMachineFiles(machine._id,machine,(res)=>{
+                                                        if(res.error){
+                                                            toaster.danger(res.error);
+                                                            return;
+                                                        }
+                                                        toaster.success(res.success);
+                                                        
+                                                    })
+                                                }}>Αποθήκευση</Button>
+                                                <Button intent="info" width="20rem" marginTop="1rem" onClick={()=>{
+                                                    window.open("/machines/" + machine._id + "/files/variableFiles/declarationOfCompliance","_blank")
+                                                }}>Εκτύπωση αρχείου</Button>
                                             </Pane>
 
                                             <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
@@ -202,133 +214,34 @@ export default function VariableFiles(props){
                                         </Pane>
                                     :
                                     tab.accessor=="qualityControlAndTests"?
-                                    <Pane width="20rem" display="flex" flexDirection="column" justifyContent="center" alignItems="center" textAlign="center" justifyItems="center">
-                                        <Pane width="100%" marginBottom="2rem">
-                                            <Button intent="success" width="20rem">Αποθήκευση</Button>
-                                            <Button intent="info" width="20rem" marginTop="1rem">Εκτύπωση αρχείου</Button>
-                                        </Pane>
-                                        
-                                        <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
-                                        <DatePicker style={{minWidth:"100%"}} value={new Date(
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["issueDate"]
-                                            :""
-                                            :""
-                                            :""
-                                        )} onChange={(date)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        issueDate:date.toString()
-                                                    }
-                                                }
-                                            }
-                                        })}/>
-
-                                        <Heading size="400">{"Ημερομηνία παραγωγής"}</Heading>
-                                        <DatePicker style={{minWidth:"100%"}} value={new Date(
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["productionDate"]
-                                            :""
-                                            :""
-                                            :""
-                                        )} onChange={(date)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        productionDate:date.toString()
-                                                    }
-                                                }
-                                            }
-                                        })}/>
-
-                                        <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" value={
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["productionManager"]
-                                            :""
-                                            :""
-                                            :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        productionManager:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
-
-                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός σειράς" value={
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["serialNumber"]
-                                            :""
-                                            :""
-                                            :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        serialNumber:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
-
-
-                                        <Button width="100%" marginTop="1rem" onClick={()=>{
-                              
-                                            setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    qualityControlAndTests:{
-                                                        data:{
-                                                            serialNumber:machine.variableFiles.declarationOfCompliance.data.serialNumber,
-                                                            productionManager:machine.variableFiles.declarationOfCompliance.data.productionManager,
-                                                            productionDate:machine.variableFiles.declarationOfCompliance.data.productionDate.toString(),
-                                                            issueDate:machine.variableFiles.declarationOfCompliance.data.issueDate.toString(),
-                                                        }
-                                                    }
-                                                }
-                                                
-                                            })
-                                            console.log(machine)
-                                        }}>Copy from declaration of compliance</Button>
-                                    </Pane>
+                                    <Heading>Under construction</Heading>
+                                   
+                                   
                                     :
                                     tab.accessor=="production"?
                                     <Pane width="20rem" display="flex" flexDirection="column" justifyContent="center" alignItems="center" textAlign="center" justifyItems="center">
                                         <Pane width="100%" marginBottom="2rem">
-                                            <Button intent="success" width="20rem">Αποθήκευση</Button>
-                                            <Button intent="info" width="20rem" marginTop="1rem">Εκτύπωση αρχείου</Button>
+                                            <Button intent="success" width="20rem" onClick={()=>{
+                                                    updateMachineFiles(machine._id,machine,(res)=>{
+                                                        if(res.error){
+                                                            toaster.danger(res.error);
+                                                            return;
+                                                        }
+                                                        toaster.success(res.success);
+                                                        
+                                                    })
+                                                }}>Αποθήκευση</Button>
+                                            <Button intent="info" width="20rem" marginTop="1rem" onClick={()=>{
+                                                 window.open("/machines/" + machine._id + "/files/variableFiles/production","_blank")
+                                            }}>Εκτύπωση αρχείου</Button>
                                         </Pane>
                                         
-                                        <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
+                                        <Heading size="400">{"Ημερομηνία έναρξης εργασιών"}</Heading>
                                         <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
                                             machine.variableFiles[tab.accessor]?
                                             machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["issueDate"]
+                                            machine.variableFiles[tab.accessor].data["startDate"]
                                             :""
                                             :""
                                             :""
@@ -339,33 +252,13 @@ export default function VariableFiles(props){
                                                 [tab.accessor]:{
                                                     data:{
                                                         ...machine.variableFiles[tab.accessor].data,
-                                                        issueDate:date.toString()
+                                                        startDate:date.toString()
                                                     }
                                                 }
                                             }
                                         })}/>
 
-                                        <Heading size="400">{"Ημερομηνία παραγωγής"}</Heading>
-                                        <DatePicker style={{minWidth:"100%"}} value={new Date(
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["productionDate"]
-                                            :""
-                                            :""
-                                            :""
-                                        )} onChange={(date)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        productionDate:date.toString()
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                      
 
                                         <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" value={
                                             machine.variableFiles?
@@ -409,6 +302,262 @@ export default function VariableFiles(props){
                                             }
                                         })}/>
 
+                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός παραγγελίας" type="number" value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data["orderNumber"]
+                                            :""
+                                            :""
+                                            :""
+                                        } onChange={(e)=>setMachine({
+                                            ...machine,
+                                            variableFiles:{
+                                                ...machine.variableFiles,
+                                                [tab.accessor]:{
+                                                    data:{
+                                                        ...machine.variableFiles[tab.accessor].data,
+                                                        orderNumber:e.target.value
+                                                    }
+                                                }
+                                            }
+                                        })}/>
+
+                                        <TextInputField width="100%" marginBottom="0"  label="Τεμάχια" type="number" value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data["quantity"]
+                                            :""
+                                            :""
+                                            :""
+                                        } onChange={(e)=>setMachine({
+                                            ...machine,
+                                            variableFiles:{
+                                                ...machine.variableFiles,
+                                                [tab.accessor]:{
+                                                    data:{
+                                                        ...machine.variableFiles[tab.accessor].data,
+                                                        quantity:e.target.value
+                                                    }
+                                                }
+                                            }
+                                        })}/>
+
+                                        <Heading size="400">{"Σειρά εκτέλεσης και είδος εργασιών"}</Heading>
+                                        <Card
+                                            elevation={1}
+                                            float="left"
+                                            width={"100%"}
+                                            padding="1rem"
+                                            margin="0.5rem"
+                                            display="flex"
+                                            justifyContent="center"
+                                            justifyItems="center"
+                                            alignItems="center"
+                                            flexDirection="row"
+                                            background="tint1"
+                                            flexWrap="wrap"
+                                        >
+                                            <Heading size="500"  marginBottom="10px" >{"Κοπές"}</Heading>
+                                     
+                                            <TextInputField width="100%" marginBottom="0"  label="Τεχνίτης"  value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data.jobs.cuts.name
+                                            :""
+                                            :""
+                                            :""
+                                            } onChange={(e)=>setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    [tab.accessor]:{
+                                                        data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
+                                                            jobs:{
+                                                                ...machine.variableFiles[tab.accessor].data.jobs,
+                                                                cuts:{
+                                                                    ...machine.variableFiles[tab.accessor].data.jobs.cuts,
+                                                                    name:e.target.value
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })}/>
+                                            <Heading size="400">{"Ημερομηνία"}</Heading>
+                                            <DatePicker style={{minWidth:"100%"}} value={new Date(
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data.jobs.cuts.date
+                                            :""
+                                            :""
+                                            :""
+                                            )} onChange={(date)=>setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    [tab.accessor]:{
+                                                        data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
+                                                            jobs:{
+                                                                ...machine.variableFiles[tab.accessor].data.jobs,
+                                                                cuts:{
+                                                                    ...machine.variableFiles[tab.accessor].data.jobs.cuts,
+                                                                    date:date.toString()
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })}/>
+
+                                        </Card>
+                                        <Card
+                                            elevation={1}
+                                            float="left"
+                                            width={"100%"}
+                                            padding="1rem"
+                                            margin="0.5rem"
+                                            display="flex"
+                                            justifyContent="center"
+                                            justifyItems="center"
+                                            alignItems="center"
+                                            flexDirection="row"
+                                            background="tint1"
+                                            flexWrap="wrap"
+                                        >
+                                            <Heading size="500"  marginBottom="10px" >{"Συγκολλήσεις"}</Heading>
+                                     
+                                            <TextInputField width="100%" marginBottom="0"  label="Τεχνίτης"  value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data.jobs.soldering.name
+                                            :""
+                                            :""
+                                            :""
+                                            } onChange={(e)=>setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    [tab.accessor]:{
+                                                        data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
+                                                            jobs:{
+                                                                ...machine.variableFiles[tab.accessor].data.jobs,
+                                                                soldering:{
+                                                                    ...machine.variableFiles[tab.accessor].data.jobs.soldering,
+                                                                    name:e.target.value
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })}/>
+                                            <Heading size="400">{"Ημερομηνία"}</Heading>
+                                            <DatePicker style={{minWidth:"100%"}} value={new Date(
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data.jobs.soldering.date
+                                            :""
+                                            :""
+                                            :""
+                                            )} onChange={(date)=>setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    [tab.accessor]:{
+                                                        data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
+                                                            jobs:{
+                                                                ...machine.variableFiles[tab.accessor].data.jobs,
+                                                                soldering:{
+                                                                    ...machine.variableFiles[tab.accessor].data.jobs.soldering,
+                                                                    date:date.toString()
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })}/>
+
+                                        </Card>
+                                        <Card
+                                            elevation={1}
+                                            float="left"
+                                            width={"100%"}
+                                            padding="1rem"
+                                            margin="0.5rem"
+                                            display="flex"
+                                            justifyContent="center"
+                                            justifyItems="center"
+                                            alignItems="center"
+                                            flexDirection="row"
+                                            background="tint1"
+                                            flexWrap="wrap"
+                                        >
+                                            <Heading size="500"  marginBottom="10px" >{"Μοντάρισμα"}</Heading>
+                                     
+                                            <TextInputField width="100%" marginBottom="0"  label="Τεχνίτης"  value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data.jobs.modding.name
+                                            :""
+                                            :""
+                                            :""
+                                            } onChange={(e)=>setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    [tab.accessor]:{
+                                                        data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
+                                                            jobs:{
+                                                                ...machine.variableFiles[tab.accessor].data.jobs,
+                                                                modding:{
+                                                                    ...machine.variableFiles[tab.accessor].data.jobs.modding,
+                                                                    name:e.target.value
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })}/>
+                                            <Heading size="400">{"Ημερομηνία"}</Heading>
+                                            <DatePicker style={{minWidth:"100%"}} value={new Date(
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data.jobs.modding.date
+                                            :""
+                                            :""
+                                            :""
+                                            )} onChange={(date)=>setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    [tab.accessor]:{
+                                                        data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
+                                                            jobs:{
+                                                                ...machine.variableFiles[tab.accessor].data.jobs,
+                                                                modding:{
+                                                                    ...machine.variableFiles[tab.accessor].data.jobs.modding,
+                                                                    date:date.toString()
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })}/>
+
+                                        </Card>
 
                                         <Button width="100%" marginTop="1rem" onClick={()=>{
                               
@@ -418,10 +567,9 @@ export default function VariableFiles(props){
                                                     ...machine.variableFiles,
                                                     production:{
                                                         data:{
+                                                            ...machine.variableFiles[tab.accessor].data,
                                                             serialNumber:machine.variableFiles.declarationOfCompliance.data.serialNumber,
-                                                            productionManager:machine.variableFiles.declarationOfCompliance.data.productionManager,
-                                                            productionDate:machine.variableFiles.declarationOfCompliance.data.productionDate.toString(),
-                                                            issueDate:machine.variableFiles.declarationOfCompliance.data.issueDate.toString(),
+                                                            productionManager:machine.variableFiles.declarationOfCompliance.data.productionManager
                                                         }
                                                     }
                                                 }
@@ -435,8 +583,19 @@ export default function VariableFiles(props){
                                     <>
                                     <Pane width="20rem" display="flex" flexDirection="column" justifyContent="center" alignItems="center" textAlign="center" justifyItems="center">
                                         <Pane width="100%" marginBottom="2rem">
-                                            <Button intent="success" width="20rem">Αποθήκευση</Button>
-                                            <Button intent="info" width="20rem" marginTop="1rem">Εκτύπωση αρχείου</Button>
+                                            <Button intent="success" width="20rem" onClick={()=>{
+                                                    updateMachineFiles(machine._id,machine,(res)=>{
+                                                        if(res.error){
+                                                            toaster.danger(res.error);
+                                                            return;
+                                                        }
+                                                        toaster.success(res.success);
+                                                        
+                                                    })
+                                                }}>Αποθήκευση</Button>
+                                            <Button intent="info" width="20rem" marginTop="1rem" onClick={()=>{
+                                                   window.open("/machines/" + machine._id + "/files/variableFiles/partsList","_blank")
+                                            }}>Εκτύπωση αρχείου</Button>
                                         </Pane>
                                         
                                         <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
@@ -589,8 +748,9 @@ export default function VariableFiles(props){
                                                                   variableFiles:{
                                                                       ...machine.variableFiles,
                                                                       partsList:{
-                                                                          ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
+                                                                  
                                                                           data:{
+                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
                                                                               parts:parts
                                                                           }
                                                                       }
@@ -606,8 +766,9 @@ export default function VariableFiles(props){
                                                                   variableFiles:{
                                                                       ...machine.variableFiles,
                                                                       partsList:{
-                                                                          ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
+                                                                        
                                                                           data:{
+                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
                                                                               parts:parts
                                                                           }
                                                                       }
@@ -623,8 +784,9 @@ export default function VariableFiles(props){
                                                                   variableFiles:{
                                                                       ...machine.variableFiles,
                                                                       partsList:{
-                                                                          ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
+                                                                  
                                                                           data:{
+                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
                                                                               parts:parts
                                                                           }
                                                                       }
@@ -640,8 +802,9 @@ export default function VariableFiles(props){
                                                                   variableFiles:{
                                                                       ...machine.variableFiles,
                                                                       partsList:{
-                                                                          ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
+                                                                         
                                                                           data:{
+                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
                                                                               parts:parts
                                                                           }
                                                                       }
@@ -658,8 +821,9 @@ export default function VariableFiles(props){
                                                                  variableFiles:{
                                                                      ...machine.variableFiles,
                                                                      partsList:{
-                                                                         ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
+                                                                     
                                                                          data:{
+                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
                                                                              parts:parts
                                                                          }
                                                                      }
@@ -687,8 +851,9 @@ export default function VariableFiles(props){
                                                 variableFiles:{
                                                     ...machine.variableFiles,
                                                     partsList:{
-                                                        ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
+                                                       
                                                         data:{
+                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
                                                             parts:parts
                                                         }
                                                     }
@@ -728,4 +893,133 @@ export default function VariableFiles(props){
         
     )
 }
+
+
+
+
+
+  /*
+                                        <Pane width="20rem" display="flex" flexDirection="column" justifyContent="center" alignItems="center" textAlign="center" justifyItems="center">
+                                        <Pane width="100%" marginBottom="2rem">
+                                            <Button intent="success" width="20rem" onClick={()=>{
+                                                    updateMachineFiles(machine._id,machine,(res)=>{
+                                                        if(res.error){
+                                                            toaster.danger(res.error);
+                                                            return;
+                                                        }
+                                                        toaster.success(res.success);
+                                                        
+                                                    })
+                                                }}>Αποθήκευση</Button>
+                                            <Button intent="info" width="20rem" marginTop="1rem">Εκτύπωση αρχείου</Button>
+                                        </Pane>
+                                        
+                                        <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
+                                        <DatePicker style={{minWidth:"100%"}} value={new Date(
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data["issueDate"]
+                                            :""
+                                            :""
+                                            :""
+                                        )} onChange={(date)=>setMachine({
+                                            ...machine,
+                                            variableFiles:{
+                                                ...machine.variableFiles,
+                                                [tab.accessor]:{
+                                                    data:{
+                                                        ...machine.variableFiles[tab.accessor].data,
+                                                        issueDate:date.toString()
+                                                    }
+                                                }
+                                            }
+                                        })}/>
+
+                                        <Heading size="400">{"Ημερομηνία παραγωγής"}</Heading>
+                                        <DatePicker style={{minWidth:"100%"}} value={new Date(
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data["productionDate"]
+                                            :""
+                                            :""
+                                            :""
+                                        )} onChange={(date)=>setMachine({
+                                            ...machine,
+                                            variableFiles:{
+                                                ...machine.variableFiles,
+                                                [tab.accessor]:{
+                                                    data:{
+                                                        ...machine.variableFiles[tab.accessor].data,
+                                                        productionDate:date.toString()
+                                                    }
+                                                }
+                                            }
+                                        })}/>
+
+                                        <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data["productionManager"]
+                                            :""
+                                            :""
+                                            :""
+                                        } onChange={(e)=>setMachine({
+                                            ...machine,
+                                            variableFiles:{
+                                                ...machine.variableFiles,
+                                                [tab.accessor]:{
+                                                    data:{
+                                                        ...machine.variableFiles[tab.accessor].data,
+                                                        productionManager:e.target.value
+                                                    }
+                                                }
+                                            }
+                                        })}/>
+
+                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός σειράς" value={
+                                            machine.variableFiles?
+                                            machine.variableFiles[tab.accessor]?
+                                            machine.variableFiles[tab.accessor].data?
+                                            machine.variableFiles[tab.accessor].data["serialNumber"]
+                                            :""
+                                            :""
+                                            :""
+                                        } onChange={(e)=>setMachine({
+                                            ...machine,
+                                            variableFiles:{
+                                                ...machine.variableFiles,
+                                                [tab.accessor]:{
+                                                    data:{
+                                                        ...machine.variableFiles[tab.accessor].data,
+                                                        serialNumber:e.target.value
+                                                    }
+                                                }
+                                            }
+                                        })}/>
+
+
+                                        <Button width="100%" marginTop="1rem" onClick={()=>{
+                              
+                                            setMachine({
+                                                ...machine,
+                                                variableFiles:{
+                                                    ...machine.variableFiles,
+                                                    qualityControlAndTests:{
+                                                        data:{
+                                                            serialNumber:machine.variableFiles.declarationOfCompliance.data.serialNumber,
+                                                            productionManager:machine.variableFiles.declarationOfCompliance.data.productionManager,
+                                                            productionDate:machine.variableFiles.declarationOfCompliance.data.productionDate.toString(),
+                                                            issueDate:machine.variableFiles.declarationOfCompliance.data.issueDate.toString(),
+                                                        }
+                                                    }
+                                                }
+                                                
+                                            })
+                                            console.log(machine)
+                                        }}>Copy from declaration of compliance</Button>
+                                    </Pane>
+                                    */
 

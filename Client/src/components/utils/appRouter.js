@@ -11,6 +11,16 @@ import PresetFiles from "../presetFiles"
 import ManualFiles from "../manualFiles"
 import VariableFiles from '../variableFiles';
 import Messages from '../messages';
+import DeclarationOfComplinace from '../templates/declarationOfCompliance';
+import Production from '../templates/production';
+import PartsList from "../templates/partsList"
+import FileValidator from "../fileValidator"
+
+//----Admin
+import AdminDashboard from "../admin/admin.dashboard"
+import AdminHeader from "../admin/admin.header"
+import AdminUserActions from "../admin/admin.userActions"
+import AdminAddNewMachine from "../admin/admin.addNewMachine"
 
 import {
     BrowserRouter as Router,
@@ -52,12 +62,58 @@ export default function AppRouter(props){
                             </>
                         }
                     </Route>
+                    <Route exact path="/admin/dashboard">
+                        {
+                        auth?
+                        <>
+                        <AdminHeader />
+                        <AdminDashboard />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/admin/users/:userID">
+                        {
+                        auth?
+                        <>
+                        <AdminHeader />
+                        <AdminUserActions />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/admin/users/:userID/newMachine">
+                        {
+                        auth?
+                        <>
+                        <AdminHeader />
+                        <AdminAddNewMachine />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+
+                    
                     <Route exact path="/dashboard">
                         {
                         auth?
                         <>
                         <Header/>
                         <Dashboard />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/fileValidator">
+                        {
+                        auth?
+                        <>
+                        <Header/>
+                        <FileValidator />
                         </>
                         :
                         <Redirect to="/"/>
@@ -102,6 +158,36 @@ export default function AppRouter(props){
                         <>
                         <Header/>
                         <VariableFiles />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/machines/:machineID/files/variableFiles/declarationOfCompliance">
+                        {
+                        auth?
+                        <>
+                        <DeclarationOfComplinace />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/machines/:machineID/files/variableFiles/production">
+                        {
+                        auth?
+                        <>
+                        <Production />
+                        </>
+                        :
+                        <Redirect to="/"/>
+                        }
+                    </Route>
+                    <Route exact path="/machines/:machineID/files/variableFiles/partsList">
+                        {
+                        auth?
+                        <>
+                        <PartsList />
                         </>
                         :
                         <Redirect to="/"/>

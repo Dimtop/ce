@@ -10,4 +10,5 @@ router.get("/users/:userID",messageController.getUserMessages)
 router.get("/users/:userID/count",messageController.getUserUnreadMessagesCount)
 router.put("/:messageID/read",messageController.markMessageAsRead)
 
+
 module.exports = router;

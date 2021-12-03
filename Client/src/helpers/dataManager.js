@@ -131,6 +131,85 @@ function markMessageAsRead(mID,cb){
 }
 
 
+function updateMachineFiles(mID,machine,cb){
+    fetch("/api/machines/" + mID + "/files",{
+        method:"put",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            machine:machine
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+
+function validateFile(fileCode,cb){
+    fetch("/api/machines/validateFile",{
+        method:"post",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            fileCode:fileCode
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+
+function generateFileCode(machineID,fileIndicator,cb){
+    fetch("/api/machines/generateFileCode",{
+        method:"post",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            machineID:machineID,
+            fileIndicator:fileIndicator
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+
+
+function getAllUsers(cb){
+    fetch("/api/users/all",{
+        method:"get",
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+
+function getAllMachineCategories(cb){
+    fetch("/api/machineCategories/all",{
+        method:"get",
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+export {getAllMachineCategories}
+export {getAllUsers}
 export {getUserMachines}
 export {getUserByID}
 export {updateUser}
@@ -140,3 +219,6 @@ export {uploadMachineFile}
 export {getUserUnreadMessagesCount}
 export {getUserMessages}
 export {markMessageAsRead}
+export { updateMachineFiles}
+export {validateFile}
+export {generateFileCode}

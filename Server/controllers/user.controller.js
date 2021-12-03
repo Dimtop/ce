@@ -8,6 +8,23 @@ const fs = require("fs")
 const UserFolderService = require("../services/userFolderService");
 
 
+
+exports.getAllUsers = async(req,res)=>{
+
+    console.log("asdd")
+    try{
+        var users = await userModel.find();
+        res.status(200).send({success:"Users retreived successfully",data:{users:users}})
+    }
+    catch(error){
+        console.log(error)
+        res.status(400).send({error:"Something went wrong."})
+        return;
+    }
+
+}
+
+
 exports.authenticateUser = async(req,res)=>{
     
     var user = await userModel.findOne({username:req.body.username});
@@ -22,10 +39,11 @@ exports.authenticateUser = async(req,res)=>{
         return
     }
 
-    res.status(200).send({success:"Successfull authentication.",data:{userID:user._id}})
+    res.status(200).send({success:"Successfull authentication.",data:{user:user,userID:user._id}})
 }
 
 exports.getUserMachines = async(req,res)=>{
+    console.log(req.params)
     var machines = await machineModel.find({userID:req.params.userID});
 
     res.status(200).send({data:{machines:machines}})

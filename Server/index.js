@@ -8,12 +8,13 @@ const fileUpload = require("express-fileupload");
 
 
 //Middlewares
-const dbConnect = require('./Middlewares/dbConnect');
+const dbConnect = require('./middlewares/dbConnect');
 
 //Routers
 const userRouter = require("./routers/user.router")
 const machineRouter =require("./routers/machine.router")
 const messageRouter = require("./routers/message.router")
+const machineCategoryRouter = require("./routers/machineCategory.router")
 
 //Initiallizing the app
 const app = express();
@@ -32,20 +33,21 @@ app.use(express.static(path.join(__dirname,"files")))
 
 //Static files
 //app.use(express.static("Media"));
-//app.use(express.static("Public"));
+app.use(express.static("public"));
 //Client serving
 
-/*app.get("*",(req,res)=>{
-    res.sendFile(path.join(__dirname,"Public","index.html"))
-})*/
+
 
 //Routing
 
 app.use("/api/users",userRouter)
 app.use("/api/machines",machineRouter)
 app.use("/api/messages",messageRouter)
+app.use("/api/machineCategories",machineCategoryRouter)
 
-
+app.get("*",(req,res)=>{
+    res.sendFile(path.join(__dirname,"public","index.html"))
+})
 //Initializing the server
 app.listen(process.env.PORT, (err)=>{
     if(err){

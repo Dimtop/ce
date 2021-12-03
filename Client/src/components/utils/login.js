@@ -58,7 +58,12 @@ export default function Login(props){
                     }
                     
                     Cookies.set("authID",res.data.userID)
-                    location.replace("/dashboard")
+                    if(res.data.user.isAdmin){
+                        location.replace("/admin/dashboard")
+                    }else{
+                        location.replace("/dashboard")
+                    }
+                   
                 })
             }}>Login</Button>
            
