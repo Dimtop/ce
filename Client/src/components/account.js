@@ -24,7 +24,7 @@ export default function Account(props){
 
     return(
         <>
-        <Heading size={900} textAlign="center">My account</Heading>
+        <Heading size={900} textAlign="center" color="white">My account</Heading>
         <div id="accountForm">
             <TextInputField 
               label="Bussiness name"

@@ -19,7 +19,7 @@ export default function AdminHeader(props){
         <div id="header">
             <Pane  style={{width:"100%",height:"100%"}} display="flex" alignItems="center" justifyContent="start" border="none">
             <IconButton icon={MenuIcon} marginRight="2rem" onClick={()=>setShowMenu(true)}/> 
-            <Heading size="500" >Pavlos Topalidis CE Platform</Heading>
+            <Heading size="500" color="white" >Pavlos Topalidis CE Platform</Heading>
             </Pane>
 
         </div>

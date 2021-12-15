@@ -5,12 +5,14 @@ import {getMachineByID} from "../helpers/dataManager"
 
 //Components
 import { toaster,Heading,Card,Pane,Text} from 'evergreen-ui';
+import { withRouter } from 'react-router-dom';
 
-export default function MachineFileTypes(props){
+export default withRouter(function MachineFileTypes(props){
 
     const [machine,setMachine] = useState({})
 
     useEffect(()=>{
+
         var machineID = window.location.href.split("/")[window.location.href.split("/").indexOf("machines") + 1 ];
         getMachineByID(machineID,(res)=>{
             if(res.error){
@@ -19,11 +21,12 @@ export default function MachineFileTypes(props){
             }
             setMachine(res.data.machine);
         })
+        props.history.push("/machines/" +machineID+"/fileTypes")
     },[])
 
     return(
         <div id="machinesContainer">
-            <Heading size={900} textAlign="center">Αρχεία για το μηχάνημα {machine.name + " " + machine.type}</Heading>
+            <Heading size={900} textAlign="center" color="white">Αρχεία για το μηχάνημα {machine.name + " " + machine.type}</Heading>
             <Pane 
             clearfix  
             width={"100%"}
@@ -98,4 +101,4 @@ export default function MachineFileTypes(props){
         </div>
     )
     
-}
+})

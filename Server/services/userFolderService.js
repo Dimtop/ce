@@ -81,6 +81,26 @@ function UserFolderService(userID){
         }  
     }
 
+    this.clearUserFolder = ()=>{
+        try{
+            if(fs.existsSync(path.join(__dirname,"../files",this.userID))){
+                fs.rmdirSync(path.join(__dirname,"../files",this.userID), { recursive: true, force: true })
+            }
+      
+        }
+        catch(error){
+            console.log(error)
+            return {
+                error:"There was a problem.",
+                folder:null
+            }
+        }
+        return {
+            success:"The user folder was deleted."
+           
+        }  
+    }
+
 
 }
 

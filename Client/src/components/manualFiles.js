@@ -56,7 +56,7 @@ export default function ManualFiles(props){
 
             !showSpinner?
             <div id="machinesContainer">
-                <Heading size={900} textAlign="center">Manual files for {machine.name + " " + machine.type}</Heading>
+                <Heading size={900} textAlign="center"color="white">Manual files for {machine.name + " " + machine.type}</Heading>
                 <Pane 
                 clearfix  
                 width={"100%"}
@@ -72,6 +72,7 @@ export default function ManualFiles(props){
                 <Tablist marginBottom={16}   flex={"0 0 100%"} textAlign="center">
                     {tabs.map((tab, index) => (
                     <Tab
+                    color="white"
                         key={tab.name}
                         id={tab.accessor}
                         onSelect={() => setSelectedIndex(index)}
@@ -95,7 +96,10 @@ export default function ManualFiles(props){
                     >
                         {
                             machine.manualFiles[tab.accessor].links.length==0?
+                            <>
                             <Text fontWeight="bold">No files found.</Text>
+                            
+                            </>
                             :
                             <>
                             {

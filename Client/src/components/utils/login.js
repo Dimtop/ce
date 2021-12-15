@@ -6,6 +6,8 @@ import React, {useState,useEffect} from 'react'
 import Cookies from "js-cookie"
 import { TextInputField,Button,toaster} from 'evergreen-ui';
 
+
+
 export default function Login(props){
 
     const [username,setUsername] = useState("")
@@ -13,6 +15,9 @@ export default function Login(props){
     const [error,setError] = useState("")
 
 
+    useEffect(()=>{
+        Cookies.remove("authID");
+    },[])
     return(
         <>
         <div id="loginForm">
@@ -58,6 +63,8 @@ export default function Login(props){
                     }
                     
                     Cookies.set("authID",res.data.userID)
+                   
+        
                     if(res.data.user.isAdmin){
                         location.replace("/admin/dashboard")
                     }else{

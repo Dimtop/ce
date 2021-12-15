@@ -33,7 +33,7 @@ export default function Machines(){
     return(
 
         <div id="machinesContainer">
-        <Heading size={900} textAlign="center">My machines</Heading>
+        <Heading size={900} textAlign="center"             color="white">My machines</Heading>
         <Pane 
         clearfix  
         width={"100%"}

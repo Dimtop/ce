@@ -3,7 +3,7 @@ import React, {useState,useEffect} from 'react';
 
 //Helpers
 import {getMachineByID,getUserByID,generateFileCode} from "../../helpers/dataManager"
-import getFileNameFromURL from "../../helpers/getFileNameFromURL"
+import getIDFromURL from "../../helpers/getIDFromURL"
 import getObjectPropertySafe from "../../helpers/getObjectPropertySafe"
 
 ///Libraries
@@ -21,6 +21,7 @@ export default function Production(props){
     const [fileCode,setFileCode] = useState("")
     const [showSpinner,setShowSpinner] = useState(true)
     const [user,setUser] = useState({})
+    const [fid,setFID] = useState(getIDFromURL(window.location.href,"variableFiles"))
 
     useEffect(()=>{
         var machineID = window.location.href.split("/")[window.location.href.split("/").indexOf("machines") + 1 ];
@@ -28,7 +29,7 @@ export default function Production(props){
             setUser(data.user)
         })
 
-        generateFileCode(machineID,"production",(res)=>{
+        generateFileCode(machineID,fid,"production",(res)=>{
             if(res.error){
                 toaster.danger(res.error);
                 return;
@@ -57,24 +58,25 @@ export default function Production(props){
             {
                 !showSpinner?
                 <>
-                <QRCode value="asd" style={{position:"fixed",width:"5rem",height:"5rem",top:"0",right:"0",margin:"1rem"}}/>
+                 <div style={{height:"100vh",width:"100vw",backgroundColor:"white"}}>
+                 <QRCode value={"https://cecloud.gr/fileValidator?fc=" +fileCode}  style={{position:"fixed",width:"5rem",height:"5rem",top:"0",right:"0",margin:"1rem"}}/>
                 <div style={{textAlign:"center"}}>
                     <div style={{textAlign:'center'}}>
-                        <h4 style={{color:"black"}}>ΕΝΤΟΛΗ ΕΚΤΕΛΕΣΗΣ ΠΑΡΑΓΓΕΛΙΑΣ - No. {machine.variableFiles.production.data.orderNumber}</h4>
+                        <h4 style={{color:"black"}}>ΕΝΤΟΛΗ ΕΚΤΕΛΕΣΗΣ ΠΑΡΑΓΓΕΛΙΑΣ - No. {machine.variableFiles[fid].production.data.orderNumber}</h4>
                         <p style={{color:"black",fontSize:"1rem"}}>1. ΣΥΝΤΟΜΗ ΠΕΡΙΓΡΑΦΗ ΑΠΑΙΤΟΥΜΕΝΗΣ ΕΡΓΑΣΙΑΣ ΓΙΑ ΤΗΝ ΚΑΤΑΣΚΕΥΗ ΤΟΥ ΠΡΟΪΟΝΤΟΣ</p>
                     </div>
                     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",width:"100%",marginTop:"2rem"}}>
                         <div>
-                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Αριθμός σειράς: </b> {machine.variableFiles.production.data.serialNumber}</p>
+                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Αριθμός σειράς: </b> {machine.variableFiles[fid].serialNumber}</p>
                         </div>
                         <div>
-                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Ημερομηνία: </b> {new Date(machine.variableFiles.production.data.startDate).toDateString()}</p>
+                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Ημερομηνία: </b> {new Date(machine.variableFiles[fid].production.data.startDate).toDateString()}</p>
                         </div>
                         <div>
                             <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Μηχάνημα: </b> {machine.name + " " + machine.type}</p>
                         </div>
                         <div>
-                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Τεμάχια: </b> {machine.variableFiles.production.data.quantity}</p>
+                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Τεμάχια: </b> {machine.variableFiles[fid].production.data.quantity}</p>
                         </div>
                     </div>
                     <div style={{textAlign:'center',marginTop:"2rem"}}>
@@ -88,22 +90,22 @@ export default function Production(props){
                             <tr style={{border:"1px solid black"}}>
                                 <td style={{border:"1px solid black"}}>1</td>
                                 <td style={{border:"1px solid black"}}>Κοπές</td>
-                                <td style={{border:"1px solid black"}}>{machine.variableFiles.production.data.jobs.cuts.name}</td>
-                                <td style={{border:"1px solid black"}}>{new Date(machine.variableFiles.production.data.jobs.cuts.date).toDateString()}</td>
+                                <td style={{border:"1px solid black"}}>{machine.variableFiles[fid].production.data.jobs.cuts.name}</td>
+                                <td style={{border:"1px solid black"}}>{new Date(machine.variableFiles[fid].production.data.jobs.cuts.date).toDateString()}</td>
                             </tr>
 
                             <tr style={{border:"1px solid black"}}>
                                 <td style={{border:"1px solid black"}}>1</td>
                                 <td style={{border:"1px solid black"}}>Συγκολλήσεις</td>
-                                <td style={{border:"1px solid black"}}>{machine.variableFiles.production.data.jobs.soldering.name}</td>
-                                <td style={{border:"1px solid black"}}>{new Date(machine.variableFiles.production.data.jobs.soldering.date).toDateString()}</td>
+                                <td style={{border:"1px solid black"}}>{machine.variableFiles[fid].production.data.jobs.soldering.name}</td>
+                                <td style={{border:"1px solid black"}}>{new Date(machine.variableFiles[fid].production.data.jobs.soldering.date).toDateString()}</td>
                             </tr>
 
                             <tr style={{border:"1px solid black"}}>
                                 <td style={{border:"1px solid black"}}>1</td>
                                 <td style={{border:"1px solid black"}}>Μοντάρισμα</td>
-                                <td style={{border:"1px solid black"}}>{machine.variableFiles.production.data.jobs.modding.name}</td>
-                                <td style={{border:"1px solid black"}}>{new Date(machine.variableFiles.production.data.jobs.modding.date).toDateString()}</td>
+                                <td style={{border:"1px solid black"}}>{machine.variableFiles[fid].production.data.jobs.modding.name}</td>
+                                <td style={{border:"1px solid black"}}>{new Date(machine.variableFiles[fid].production.data.jobs.modding.date).toDateString()}</td>
                             </tr>
                         </table>
                     </div>
@@ -152,11 +154,12 @@ export default function Production(props){
                     </div>
                     <div style={{textAlign:'right',marginTop:"10rem"}}>
                         <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Υπεύθυνος παραγωγής</b><br></br>(Υπογραφή)</p>
-                        <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}>{machine.variableFiles.production.data.productionManager}</p>
+                        <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}>{machine.variableFiles[fid].production.data.productionManager}</p>
                     </div>
                     <div>
-                        <p style={{fontSize:"0.7rem",color:"black",marginTop:"1rem"}}>{"Κωδικός εγγράφου: " +fileCode}</p>
+                    <p style={{fontSize:"0.7rem",color:"black",marginTop:"1rem",wordBreak:"break-all",wordWrap:"break-word"}}>{"Κωδικός εγγράφου: " +fileCode}</p>
                     </div>
+                </div>
                 </div>
                 </>
                 :

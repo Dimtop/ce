@@ -59,7 +59,7 @@ export default function MenuDrawer(props){
                     <Button width="100%" margin={"1rem"}>Contact</Button>
                     <Button appearance="primary" width="100%" margin={"1rem"} onClick={()=>{
                         Cookies.remove("authID")
-                        location.reload()
+                        location.replace("/")
                     }}>Logout</Button>
                 </Pane>
           

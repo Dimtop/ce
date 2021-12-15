@@ -2,7 +2,7 @@ import React, {useState,useEffect} from 'react'
 
 //Helpers
 import {getMachineByID,getUserByID,generateFileCode} from "../../helpers/dataManager"
-import getFileNameFromURL from "../../helpers/getFileNameFromURL"
+import getIDFromURL from "../../helpers/getIDFromURL"
 import getObjectPropertySafe from "../../helpers/getObjectPropertySafe"
 
 ///Libraries
@@ -11,7 +11,10 @@ import Cookies from "js-cookie"
 
 //Components
 import QRCode from "qrcode.react";
-import {toaster} from "evergreen-ui"
+import {toaster,Spinner} from "evergreen-ui"
+
+//Styles
+import "../../styles/template.style.css"
 
 
 export default function DeclarationOfComplinace(props){
@@ -20,14 +23,15 @@ export default function DeclarationOfComplinace(props){
     const [fileCode,setFileCode] = useState("")
     const [showSpinner,setShowSpinner] = useState(true)
     const [user,setUser] = useState({})
+    const [fid,setFID] = useState(getIDFromURL(window.location.href,"variableFiles"))
 
     useEffect(()=>{
         var machineID = window.location.href.split("/")[window.location.href.split("/").indexOf("machines") + 1 ];
-        getUserByID(Cookies.get("authID"),(data)=>{
-            setUser(data.user)
-        })
 
-        generateFileCode(machineID,"declarationOfCompliance",(res)=>{
+ 
+      
+
+        generateFileCode(machineID,fid,"declarationOfCompliance",(res)=>{
             if(res.error){
                 toaster.danger(res.error);
                 return;
@@ -40,8 +44,25 @@ export default function DeclarationOfComplinace(props){
                 toaster.danger(res.error);
                 return;
             }
+            console.log(res.data.machine)
             setMachine(res.data.machine);
-            setShowSpinner(false)
+
+            if(window.location.href.indexOf("admin")>=0){
+                console.log(res.data.machine.userID)
+                getUserByID(res.data.machine.userID,(data)=>{
+                    console.log(data)
+                    setUser(data.user)
+                    setShowSpinner(false)
+                })
+            }else{
+                getUserByID(Cookies.get("authID"),(data)=>{
+                    setUser(data.user)
+                    setShowSpinner(false)
+                })
+            }
+         
+
+            
         })
 
         
@@ -51,7 +72,14 @@ export default function DeclarationOfComplinace(props){
 
     return( 
         <>
-            <QRCode value="asd" style={{position:"fixed",width:"5rem",height:"5rem",top:"0",right:"0",margin:"1rem"}}/>
+            {
+                showSpinner?
+                <Spinner/> 
+
+                :
+                <>
+                <div style={{height:"100vh",width:"100vw",backgroundColor:"white"}}>
+  <QRCode value={"https://cecloud.gr/fileValidator?fc=" +fileCode}  style={{position:"fixed",width:"5rem",height:"5rem",top:"0",right:"0",margin:"1rem"}}/>
             <div style={{width:"100%",display:"grid",justifyItems:"center",pageBreakInside:"avoid"}}>
                 <div>
                     <img src={user.logo} style={{width:"12rem",height:"6rem"}}/>
@@ -67,7 +95,7 @@ export default function DeclarationOfComplinace(props){
                         <h5 style={{color:"dimgray"}}>DICHIARAZIONE DI CONFORMITA</h5>
                     </div>
                     <div>
-                        <img src="https://logodownload.org/wp-content/uploads/2019/11/C-E-logo-1.png" style={{width:"8rem",height:"5rem"}}/>
+                        <img src="https://i.ibb.co/HtMQjT2/1.png" style={{width:"5rem",height:"3rem"}}/>
                     </div>
                   
                 </div>
@@ -103,7 +131,7 @@ export default function DeclarationOfComplinace(props){
                         <p style={{fontSize:"0.8rem",color:"black",textAlign:"center"}}>Type - Serial Number</p>
                     </div>
                     <div style={{width:"100%",borderBottom:"1px solid black"}}>
-                        <h4 style={{textAlign:"center",color:"black"}}>{machine.serialNumber}</h4>
+                        <h4 style={{textAlign:"center",color:"black",fontSize:"1.1rem"}}>{machine.variableFiles[fid].serialNumber}</h4>
                     </div>
                     
                 </div>
@@ -114,7 +142,7 @@ export default function DeclarationOfComplinace(props){
          
                     </div>
                     <div style={{border:"2px solid black",textAlign:"center",width:"100%",marginTop:"1rem"}}>
-                        <p style={{fontSize:"0.8rem",color:"black",textAlign:"center"}}>ΕΝ 60204-1:2018</p>
+                        <p style={{fontSize:"0.8rem",color:"black",textAlign:"center"}}>{machine.standard}</p>
                     </div>
                 </div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr",justifyItems:"center",marginTop:"1rem",width:"100%"}}>
@@ -128,11 +156,11 @@ export default function DeclarationOfComplinace(props){
                     </div>
                 </div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",justifyItems:"center",height:"8rem",width:"100%",columnGap:"1rem"}}>
-                    <div style={{height:"100%",border:"none",borderBottom:"2px solid black",width:"100%"}}>
-
+                    <div style={{height:"100%",border:"none",borderBottom:"2px solid black",width:"100%",textAlign:"center"}}>
+                    <img src="https://i.ibb.co/ccGSM1H/sign.png" style={{width:"10rem",height:"5rem",marginTop:"1rem"}} />
                     </div>
                     <div style={{height:"100%",border:"none",borderBottom:"2px solid black",width:"100%",textAlign:"center"}}>
-                        <img src={user.signature} style={{width:"10rem",height:"5rem"}} />
+                 
                     </div>
                 </div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",justifyItems:"center",width:"100%",columnGap:"1rem"}}>
@@ -148,14 +176,17 @@ export default function DeclarationOfComplinace(props){
                 <div>
                     {
                         machine._id?
-                        <p style={{fontSize:"0.7rem",color:"black",marginTop:"1rem"}}>{"Κωδικός εγγράφου: " +fileCode}</p>
+                        <p style={{fontSize:"0.7rem",color:"black",marginTop:"1rem",wordBreak:"break-all",wordWrap:"break-word"}}>{"Κωδικός εγγράφου: " +fileCode}</p>
                         :
                         <></>
                     }
                     
                 </div>
             </div>  
-
+            </div>
+                </>
+            }
+          
         </>
     )
 }

@@ -2,8 +2,8 @@ import React,{useState,useEffect} from "react";
 
 //Helpers
 import {getMachineByID,updateMachineFiles} from "../helpers/dataManager"
-import getFileNameFromURL from "../helpers/getFileNameFromURL"
-import getObjectPropertySafe from "../helpers/getObjectPropertySafe"
+import getIDFromURL from "../helpers/getIDFromURL"
+import changeMachineVariableFilesData from "../helpers/changeMachineVariableFilesData"
 
 //Components
 import { toaster,Heading,Card,Pane,Text,Tablist,Tab,Spinner,Button,TextInputField} from 'evergreen-ui';
@@ -18,6 +18,7 @@ import variableFilesFields from "../constants/variableFilesFields"
 export default function VariableFiles(props){
     const [machine,setMachine] = useState({})
     const [showSpinner,setShowSpinner] = useState(true)
+    const [fID,setFID] = useState(getIDFromURL(window.location.href,"variableFiles"))
     const [tabs] = useState([
         {
             name:"Δήλωση συμμόρφωσης",
@@ -51,6 +52,8 @@ export default function VariableFiles(props){
             setMachine(res.data.machine);
             setShowSpinner(false)
         })
+
+ 
     },[])
 
 
@@ -62,7 +65,8 @@ export default function VariableFiles(props){
 
             !showSpinner?
             <div id="machinesContainer">
-                <Heading size={900} textAlign="center">Variable files for {machine.name + " " + machine.type}</Heading>
+                <Heading size={900} textAlign="center" color="white">Variable files for {machine.name + " " + machine.type}</Heading>
+                <Heading size={700} textAlign="center" color="white">Serial number: {machine.variableFiles[fID].serialNumber}</Heading>
                 <Pane 
                 clearfix  
                 width={"100%"}
@@ -78,6 +82,7 @@ export default function VariableFiles(props){
                     <Tablist marginBottom={16}   flex={"0 0 100%"} textAlign="center">
                         {tabs.map((tab, index) => (
                         <Tab
+                        color="white"
                             key={tab.name}
                             id={tab.accessor}
                             onSelect={() => setSelectedIndex(index)}
@@ -112,6 +117,7 @@ export default function VariableFiles(props){
                                         <Pane width="20rem" display="flex" flexDirection="column" justifyContent="center" alignItems="center" textAlign="center" justifyItems="center">
                                             <Pane width="100%" marginBottom="2rem">
                                                 <Button intent="success" width="20rem" onClick={()=>{
+                                                    console.log(machine)
                                                     updateMachineFiles(machine._id,machine,(res)=>{
                                                         if(res.error){
                                                             toaster.danger(res.error);
@@ -120,97 +126,52 @@ export default function VariableFiles(props){
                                                         toaster.success(res.success);
                                                         
                                                     })
+                                           
                                                 }}>Αποθήκευση</Button>
                                                 <Button intent="info" width="20rem" marginTop="1rem" onClick={()=>{
-                                                    window.open("/machines/" + machine._id + "/files/variableFiles/declarationOfCompliance","_blank")
+                                                    window.open("/machines/" + machine._id + "/files/variableFiles/"+fID+"/declarationOfCompliance","_blank")
                                                 }}>Εκτύπωση αρχείου</Button>
                                             </Pane>
 
                                             <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
                                             <DatePicker style={{minWidth:"100%"}} value={new Date(
                                                 machine.variableFiles?
-                                                machine.variableFiles[tab.accessor]?
-                                                machine.variableFiles[tab.accessor].data?
-                                                machine.variableFiles[tab.accessor].data["issueDate"]
+                                                machine.variableFiles[fID][tab.accessor]?
+                                                machine.variableFiles[fID][tab.accessor].data?
+                                                machine.variableFiles[fID][tab.accessor].data["issueDate"]
                                                 :""
                                                 :""
                                                 :""
-                                            )} onChange={(date)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            issueDate:date.toString()
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            )} onChange={(date)=>setMachine(
+                                                changeMachineVariableFilesData(machine,fID,tab.accessor,"issueDate",date.toString())
+                                            )}/>
 
                                             <Heading size="400">{"Ημερομηνία παραγωγής"}</Heading>
                                             <DatePicker style={{minWidth:"100%"}} value={new Date(
                                                 machine.variableFiles?
-                                                machine.variableFiles[tab.accessor]?
-                                                machine.variableFiles[tab.accessor].data?
-                                                machine.variableFiles[tab.accessor].data["productionDate"]
+                                                machine.variableFiles[fID][tab.accessor]?
+                                                machine.variableFiles[fID][tab.accessor].data?
+                                                machine.variableFiles[fID][tab.accessor].data["productionDate"]
                                                 :""
                                                 :""
                                                 :""
-                                            )} onChange={(date)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            productionDate:date.toString()
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            )} onChange={(date)=>setMachine(
+                                                changeMachineVariableFilesData(machine,fID,tab.accessor,"productionDate",date.toString())
+                                            )}/>
 
-                                            <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" value={
+                                            <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" color="black" value={
                                                 machine.variableFiles?
-                                                machine.variableFiles[tab.accessor]?
-                                                machine.variableFiles[tab.accessor].data?
-                                                machine.variableFiles[tab.accessor].data["productionManager"]
+                                                machine.variableFiles[fID][tab.accessor]?
+                                                machine.variableFiles[fID][tab.accessor].data?
+                                                machine.variableFiles[fID][tab.accessor].data["productionManager"]
                                                 :""
                                                 :""
                                                 :""
-                                            } onChange={(e)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            productionManager:e.target.value
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            } onChange={(e)=>setMachine(
+                                                changeMachineVariableFilesData(machine,fID,tab.accessor,"productionManager",e.target.value)
+                                            )}/>
 
-                                            <TextInputField width="100%" marginBottom="0"  label="Αριθμός σειράς" value={
-                                                machine.variableFiles?
-                                                machine.variableFiles[tab.accessor]?
-                                                machine.variableFiles[tab.accessor].data?
-                                                machine.variableFiles[tab.accessor].data["serialNumber"]
-                                                :""
-                                                :""
-                                                :""
-                                            } onChange={(e)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            serialNumber:e.target.value
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                           
                                         </Pane>
                                     :
                                     tab.accessor=="qualityControlAndTests"?
@@ -232,117 +193,62 @@ export default function VariableFiles(props){
                                                     })
                                                 }}>Αποθήκευση</Button>
                                             <Button intent="info" width="20rem" marginTop="1rem" onClick={()=>{
-                                                 window.open("/machines/" + machine._id + "/files/variableFiles/production","_blank")
+                                                 window.open("/machines/" + machine._id + "/files/variableFiles/"+fID+"/production","_blank")
                                             }}>Εκτύπωση αρχείου</Button>
                                         </Pane>
                                         
                                         <Heading size="400">{"Ημερομηνία έναρξης εργασιών"}</Heading>
                                         <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["startDate"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["startDate"]
                                             :""
                                             :""
                                             :""
-                                        )} onChange={(date)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        startDate:date.toString()
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        )} onChange={(date)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"startDate",date.toString())
+                                        )}/>
 
                                       
 
-                                        <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" value={
+                                        <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" color="black" value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["productionManager"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["productionManager"]
                                             :""
                                             :""
                                             :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        productionManager:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        } onChange={(e)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"productionManager",e.target.value)
+                                        )}/>
 
-                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός σειράς" value={
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["serialNumber"]
-                                            :""
-                                            :""
-                                            :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        serialNumber:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                       
 
-                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός παραγγελίας" type="number" value={
+                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός παραγγελίας" color="black" type="number" value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["orderNumber"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["orderNumber"]
                                             :""
                                             :""
                                             :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        orderNumber:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        } onChange={(e)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"orderNumber",e.target.value)
+                                        )}/>
 
-                                        <TextInputField width="100%" marginBottom="0"  label="Τεμάχια" type="number" value={
+                                        <TextInputField width="100%" marginBottom="0"  label="Τεμάχια" color="black" type="number" value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["quantity"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["quantity"]
                                             :""
                                             :""
                                             :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        quantity:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        } onChange={(e)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"quantity",e.target.value)
+                                        )}/>
 
                                         <Heading size="400">{"Σειρά εκτέλεσης και είδος εργασιών"}</Heading>
                                         <Card
@@ -363,57 +269,42 @@ export default function VariableFiles(props){
                                      
                                             <TextInputField width="100%" marginBottom="0"  label="Τεχνίτης"  value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data.jobs.cuts.name
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data.jobs.cuts.name
                                             :""
                                             :""
                                             :""
-                                            } onChange={(e)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            jobs:{
-                                                                ...machine.variableFiles[tab.accessor].data.jobs,
-                                                                cuts:{
-                                                                    ...machine.variableFiles[tab.accessor].data.jobs.cuts,
-                                                                    name:e.target.value
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            } 
+                                            onChange={e=>{
+                                                var tmpVariableFiles = machine.variableFiles;
+                                                tmpVariableFiles[fID][tab.accessor].data.jobs.cuts.name = e.target.value;
+                                                setMachine( {
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles                                            
+                                                });
+                                            
+                                            }}/>
                                             <Heading size="400">{"Ημερομηνία"}</Heading>
                                             <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data.jobs.cuts.date
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data.jobs.cuts.date
                                             :""
                                             :""
                                             :""
-                                            )} onChange={(date)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            jobs:{
-                                                                ...machine.variableFiles[tab.accessor].data.jobs,
-                                                                cuts:{
-                                                                    ...machine.variableFiles[tab.accessor].data.jobs.cuts,
-                                                                    date:date.toString()
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            )} onChange={(date)=>{
+                                                var tmpVariableFiles = machine.variableFiles;
+                                                tmpVariableFiles[fID][tab.accessor].data.jobs.cuts.date = date.toString();
+                                                setMachine( {
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles                                            
+                                                });
+                                            }
+                                            
+                                             
+                                            }/>
 
                                         </Card>
                                         <Card
@@ -434,57 +325,37 @@ export default function VariableFiles(props){
                                      
                                             <TextInputField width="100%" marginBottom="0"  label="Τεχνίτης"  value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data.jobs.soldering.name
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data.jobs.soldering.name
                                             :""
                                             :""
                                             :""
-                                            } onChange={(e)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            jobs:{
-                                                                ...machine.variableFiles[tab.accessor].data.jobs,
-                                                                soldering:{
-                                                                    ...machine.variableFiles[tab.accessor].data.jobs.soldering,
-                                                                    name:e.target.value
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            } onChange={(e)=>{
+                                                var tmpVariableFiles = machine.variableFiles;
+                                                tmpVariableFiles[fID][tab.accessor].data.jobs.soldering.name = e.target.value;
+                                                setMachine( {
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles                                            
+                                                });
+                                            }}/>
                                             <Heading size="400">{"Ημερομηνία"}</Heading>
                                             <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data.jobs.soldering.date
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data.jobs.soldering.date
                                             :""
                                             :""
                                             :""
-                                            )} onChange={(date)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            jobs:{
-                                                                ...machine.variableFiles[tab.accessor].data.jobs,
-                                                                soldering:{
-                                                                    ...machine.variableFiles[tab.accessor].data.jobs.soldering,
-                                                                    date:date.toString()
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            )} onChange={(date)=>{
+                                                var tmpVariableFiles = machine.variableFiles;
+                                                tmpVariableFiles[fID][tab.accessor].data.jobs.soldering.date = date.toString();
+                                                setMachine( {
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles                                            
+                                                });
+                                            }}/>
 
                                         </Card>
                                         <Card
@@ -505,78 +376,41 @@ export default function VariableFiles(props){
                                      
                                             <TextInputField width="100%" marginBottom="0"  label="Τεχνίτης"  value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data.jobs.modding.name
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data.jobs.modding.name
                                             :""
                                             :""
                                             :""
-                                            } onChange={(e)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            jobs:{
-                                                                ...machine.variableFiles[tab.accessor].data.jobs,
-                                                                modding:{
-                                                                    ...machine.variableFiles[tab.accessor].data.jobs.modding,
-                                                                    name:e.target.value
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            } onChange={(e)=>{
+                                                var tmpVariableFiles = machine.variableFiles;
+                                                tmpVariableFiles[fID][tab.accessor].data.jobs.modding.name = e.target.value;
+                                                setMachine( {
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles                                            
+                                                });
+                                            }}/>
                                             <Heading size="400">{"Ημερομηνία"}</Heading>
                                             <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data.jobs.modding.date
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data.jobs.modding.date
                                             :""
                                             :""
                                             :""
-                                            )} onChange={(date)=>setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    [tab.accessor]:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            jobs:{
-                                                                ...machine.variableFiles[tab.accessor].data.jobs,
-                                                                modding:{
-                                                                    ...machine.variableFiles[tab.accessor].data.jobs.modding,
-                                                                    date:date.toString()
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })}/>
+                                            )} onChange={(date)=>{
+                                                var tmpVariableFiles = machine.variableFiles;
+                                                tmpVariableFiles[fID][tab.accessor].data.jobs.modding.date = date.toString();
+                                                setMachine( {
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles                                            
+                                                });
+                                            }}/>
 
                                         </Card>
 
-                                        <Button width="100%" marginTop="1rem" onClick={()=>{
-                              
-                                            setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    production:{
-                                                        data:{
-                                                            ...machine.variableFiles[tab.accessor].data,
-                                                            serialNumber:machine.variableFiles.declarationOfCompliance.data.serialNumber,
-                                                            productionManager:machine.variableFiles.declarationOfCompliance.data.productionManager
-                                                        }
-                                                    }
-                                                }
-                                                
-                                            })
-                                            console.log(machine)
-                                        }}>Copy from declaration of compliance</Button>
+                                        
                                     </Pane>
                                     :
                                     tab.accessor=="partsList"?
@@ -594,137 +428,70 @@ export default function VariableFiles(props){
                                                     })
                                                 }}>Αποθήκευση</Button>
                                             <Button intent="info" width="20rem" marginTop="1rem" onClick={()=>{
-                                                   window.open("/machines/" + machine._id + "/files/variableFiles/partsList","_blank")
+                                                   window.open("/machines/" + machine._id + "/files/variableFiles/"+fID+"/partsList","_blank")
                                             }}>Εκτύπωση αρχείου</Button>
                                         </Pane>
                                         
                                         <Heading size="400">{"Ημερομηνία έκδοσης"}</Heading>
                                         <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["issueDate"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["issueDate"]
                                             :""
                                             :""
                                             :""
-                                        )} onChange={(date)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        issueDate:date.toString()
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        )} onChange={(date)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"issueDate",date.toString())
+                                        )}/>
 
                                         <Heading size="400">{"Ημερομηνία παραγωγής"}</Heading>
                                         <DatePicker style={{minWidth:"100%"}} value={new Date(
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["productionDate"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["productionDate"]
                                             :""
                                             :""
                                             :""
-                                        )} onChange={(date)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        productionDate:date.toString()
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        )} onChange={(date)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"productionDate",date.toString())
+                                        )}/>
 
                                         <TextInputField width="100%" marginBottom="0" label="Υπεύθυνος παραγωγής" value={
                                             machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["productionManager"]
+                                            machine.variableFiles[fID][tab.accessor]?
+                                            machine.variableFiles[fID][tab.accessor].data?
+                                            machine.variableFiles[fID][tab.accessor].data["productionManager"]
                                             :""
                                             :""
                                             :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        productionManager:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
+                                        } onChange={(e)=>setMachine(
+                                            changeMachineVariableFilesData(machine,fID,tab.accessor,"productionManager",e.target.value)
+                                        )}/>
 
-                                        <TextInputField width="100%" marginBottom="0"  label="Αριθμός σειράς" value={
-                                            machine.variableFiles?
-                                            machine.variableFiles[tab.accessor]?
-                                            machine.variableFiles[tab.accessor].data?
-                                            machine.variableFiles[tab.accessor].data["serialNumber"]
-                                            :""
-                                            :""
-                                            :""
-                                        } onChange={(e)=>setMachine({
-                                            ...machine,
-                                            variableFiles:{
-                                                ...machine.variableFiles,
-                                                [tab.accessor]:{
-                                                    data:{
-                                                        ...machine.variableFiles[tab.accessor].data,
-                                                        serialNumber:e.target.value
-                                                    }
-                                                }
-                                            }
-                                        })}/>
            
                                  
-                                        <Button width="100%" marginTop="1rem" onClick={()=>{
-                                            console.log(machine)
-                                            setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    partsList:{
-                                                    
-                                                        data:{
-                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                            serialNumber:machine.variableFiles.declarationOfCompliance.data.serialNumber,
-                                                            productionManager:machine.variableFiles.declarationOfCompliance.data.productionManager,
-                                                            productionDate:machine.variableFiles.declarationOfCompliance.data.productionDate.toString(),
-                                                            issueDate:machine.variableFiles.declarationOfCompliance.data.issueDate.toString(),
-                                                        }
-                                                    }
-                                                }
-                                                
-                                            })
-                                            console.log(machine)
-                                        }}>Copy from declaration of compliance</Button>
+                                
 
 
                                    
                                         </Pane>
                                         <Heading size="400" marginTop="2rem">{"Λίστα υλικών"}</Heading>
                                         {
-                                            machine.variableFiles.partsList?
-                                            machine.variableFiles.partsList.data?
-                                            machine.variableFiles.partsList.data.parts?
+                                            machine.variableFiles[fID].partsList?
+                                            machine.variableFiles[fID].partsList.data?
+                                            machine.variableFiles[fID].partsList.data.parts?
                                             <>
                                             {
-                                                machine.variableFiles.partsList.data.parts.length==0?
+                                                machine.variableFiles[fID].partsList.data.parts.length==0?
                                                 <>
                                                 <Heading size="500">Δεν βρέθηκαν υλικά</Heading>
                                             
                                                 </>
                                             
                                                 :
-                                                machine.variableFiles.partsList.data.parts.map((p,pi)=>{
+                                                machine.variableFiles[fID].partsList.data.parts.map((p,pi)=>{
                                                     return(
                                                         <Card
                                                         elevation={1}
@@ -741,95 +508,57 @@ export default function VariableFiles(props){
                                                         flexWrap="wrap"
                                                         >
                                                         <TextInputField margin="1rem" label="Όνομα" value={p.name} onChange={(e)=>{
-                                                              var parts =machine.variableFiles.partsList?machine.variableFiles.partsList.data?machine.variableFiles.partsList.data.parts:[]:[]
-                                                              parts[pi].name = e.target.value
+
+                                                            var tmpVariableFiles = machine.variableFiles
+                                                            tmpVariableFiles[fID][tab.accessor].data.parts[pi].name = e.target.value
+                                                     
                                                               setMachine({
                                                                   ...machine,
-                                                                  variableFiles:{
-                                                                      ...machine.variableFiles,
-                                                                      partsList:{
-                                                                  
-                                                                          data:{
-                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                                              parts:parts
-                                                                          }
-                                                                      }
-                                                                  }
-                                                                  
+                                                                  variableFiles:tmpVariableFiles
                                                               })
                                                         }}/>
                                                         <TextInputField margin="1rem" label="Περιγραφή"  value={p.description} onChange={(e)=>{
-                                                              var parts =machine.variableFiles.partsList?machine.variableFiles.partsList.data?machine.variableFiles.partsList.data.parts:[]:[]
-                                                              parts[pi].description = e.target.value
+                                                             
+                                                            var tmpVariableFiles = machine.variableFiles
+                                                            tmpVariableFiles[fID][tab.accessor].data.parts[pi].description = e.target.value
+                                                     
                                                               setMachine({
                                                                   ...machine,
-                                                                  variableFiles:{
-                                                                      ...machine.variableFiles,
-                                                                      partsList:{
-                                                                        
-                                                                          data:{
-                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                                              parts:parts
-                                                                          }
-                                                                      }
-                                                                  }
-                                                                  
+                                                                  variableFiles:tmpVariableFiles
                                                               })
                                                         }}/>
                                                         <TextInputField margin="1rem" label="Αριθμός σειράς" value={p.serialNumber} onChange={(e)=>{
-                                                              var parts =machine.variableFiles.partsList?machine.variableFiles.partsList.data?machine.variableFiles.partsList.data.parts:[]:[]
-                                                              parts[pi].serialNumber = e.target.value
+                                                              
+                                                            var tmpVariableFiles = machine.variableFiles
+                                                            tmpVariableFiles[fID][tab.accessor].data.parts[pi].serialNumber = e.target.value
+                                                     
                                                               setMachine({
                                                                   ...machine,
-                                                                  variableFiles:{
-                                                                      ...machine.variableFiles,
-                                                                      partsList:{
-                                                                  
-                                                                          data:{
-                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                                              parts:parts
-                                                                          }
-                                                                      }
-                                                                  }
-                                                                  
+                                                                  variableFiles:tmpVariableFiles
                                                               })
                                                         }}/>
                                                         <TextInputField margin="1rem" label="Προμηθευτής"  value={p.vendor} onChange={(e)=>{
-                                                              var parts =machine.variableFiles.partsList?machine.variableFiles.partsList.data?machine.variableFiles.partsList.data.parts:[]:[]
-                                                              parts[pi].vendor = e.target.value
+                                                            
+                                                            var tmpVariableFiles = machine.variableFiles
+                                                            tmpVariableFiles[fID][tab.accessor].data.parts[pi].vendor = e.target.value
+                                                     
                                                               setMachine({
                                                                   ...machine,
-                                                                  variableFiles:{
-                                                                      ...machine.variableFiles,
-                                                                      partsList:{
-                                                                         
-                                                                          data:{
-                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                                              parts:parts
-                                                                          }
-                                                                      }
-                                                                  }
-                                                                  
+                                                                  variableFiles:tmpVariableFiles
                                                               })
                                                         }}/>
                                                         <Pane width="100%">
                                                         <Button intent="danger" width="20rem" onClick={()=>{
-                                                             var parts =machine.variableFiles.partsList?machine.variableFiles.partsList.data?machine.variableFiles.partsList.data.parts:[]:[]
-                                                             parts.splice(pi,1)
-                                                             setMachine({
-                                                                 ...machine,
-                                                                 variableFiles:{
-                                                                     ...machine.variableFiles,
-                                                                     partsList:{
-                                                                     
-                                                                         data:{
-                                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                                             parts:parts
-                                                                         }
-                                                                     }
-                                                                 }
-                                                                 
-                                                             })
+                                                            
+                                                            var tmpVariableFiles = machine.variableFiles
+                                                            tmpVariableFiles[fID][tab.accessor].data.parts.splice(pi,1) 
+                                                     
+                                                              setMachine({
+                                                                  ...machine,
+                                                                  variableFiles:tmpVariableFiles
+                                                              })
+                                                             
+                                                           
                                                         }}>Αφαίρεση</Button>
                                                         </Pane>
                                                         
@@ -838,28 +567,19 @@ export default function VariableFiles(props){
                                                 })
                                             }
                                             <Button appearance="primary" marginTop="1rem" width="20rem" onClick={()=>{
+                                                var tmpVariableFiles = machine.variableFiles
+                                                tmpVariableFiles[fID][tab.accessor].data.parts.push({
+                                                    name:"",
+                                                    description:"",
+                                                    serialNumber:"",
+                                                    vendor:""
+                                                })
 
-                                            var parts =machine.variableFiles.partsList?machine.variableFiles.partsList.data?machine.variableFiles.partsList.data.parts:[]:[]
-                                            parts.push({
-                                                name:"",
-                                                description:"",
-                                                serialNumber:"",
-                                                vendor:""
-                                            })
-                                            setMachine({
-                                                ...machine,
-                                                variableFiles:{
-                                                    ...machine.variableFiles,
-                                                    partsList:{
-                                                       
-                                                        data:{
-                                                            ...machine.variableFiles.partsList?machine.variableFiles.partsList.data:{},
-                                                            parts:parts
-                                                        }
-                                                    }
-                                                }
-                                                
-                                            })
+                                                setMachine({
+                                                    ...machine,
+                                                    variableFiles:tmpVariableFiles
+                                                })
+                                          
                                             }}>Προσθήκη</Button>
                                             </>
                                             : 

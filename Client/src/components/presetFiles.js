@@ -61,6 +61,7 @@ export default function PresetFiles(props){
             setMachine(res.data.machine);
             setShowSpinner(false)
         })
+       
     },[])
 
     return(
@@ -69,7 +70,7 @@ export default function PresetFiles(props){
 
             !showSpinner?
             <div id="machinesContainer">
-                <Heading size={900} textAlign="center">Preset files for {machine.name + " " + machine.type}</Heading>
+                <Heading size={900} textAlign="center" color="white">Preset files for {machine.name + " " + machine.type}</Heading>
                 <Pane 
                 clearfix  
                 width={"100%"}
@@ -85,6 +86,7 @@ export default function PresetFiles(props){
                 <Tablist marginBottom={16}   flex={"0 0 100%"} textAlign="center">
                     {tabs.map((tab, index) => (
                     <Tab
+                    color="white"
                         key={tab.name}
                         id={tab.accessor}
                         onSelect={() => setSelectedIndex(index)}

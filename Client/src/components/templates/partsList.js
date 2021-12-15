@@ -2,7 +2,7 @@ import React, {useState,useEffect} from "react";
 
 //Helpers
 import {getMachineByID,getUserByID,generateFileCode} from "../../helpers/dataManager"
-import getFileNameFromURL from "../../helpers/getFileNameFromURL"
+import getIDFromURL from "../../helpers/getIDFromURL"
 import getObjectPropertySafe from "../../helpers/getObjectPropertySafe"
 
 ///Libraries
@@ -22,6 +22,8 @@ export default function PartsList(props){
     const [fileCode,setFileCode] = useState("")
     const [showSpinner,setShowSpinner] = useState(true)
     const [user,setUser] = useState({})
+    const [fid,setFID] = useState(getIDFromURL(window.location.href,"variableFiles"))
+
 
     useEffect(()=>{
         var machineID = window.location.href.split("/")[window.location.href.split("/").indexOf("machines") + 1 ];
@@ -29,7 +31,7 @@ export default function PartsList(props){
             setUser(data.user)
         })
 
-        generateFileCode(machineID,"partsList",(res)=>{
+        generateFileCode(machineID,fid,"partsList",(res)=>{
             if(res.error){
                 toaster.danger(res.error);
                 return;
@@ -55,24 +57,25 @@ export default function PartsList(props){
         {
                 !showSpinner?
                 <>
-                  <QRCode value="asd" style={{position:"fixed",width:"5rem",height:"5rem",top:"0",right:"0",margin:"1rem"}}/>
+                <div style={{height:"100vh",width:"100vw",backgroundColor:"white"}}>
+                <QRCode value={"https://cecloud.gr/fileValidator?fc=" +fileCode}  style={{position:"fixed",width:"5rem",height:"5rem",top:"0",right:"0",margin:"1rem"}}/>
                 <div style={{textAlign:"center"}}>
                     <div style={{textAlign:'center'}}>
                         <h4 style={{color:"black"}}>ΛΙΣΤΑ ΥΛΙΚΩΝ</h4>
 
                     </div>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",width:"100%",marginTop:"2rem"}}>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr",width:"100%",marginTop:"2rem"}}>
                         <div>
-                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Αριθμός σειράς: </b> {machine.variableFiles.partsList.data.serialNumber}</p>
+                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Αριθμός σειράς: </b> {machine.variableFiles[fid].serialNumber}</p>
                         </div>
                         <div>
-                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Ημερομηνία έκδοσης: </b> {new Date(machine.variableFiles.partsList.data.issueDate).toDateString()}</p>
+                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Ημερομηνία έκδοσης: </b> {new Date(machine.variableFiles[fid].partsList.data.issueDate).toDateString()}</p>
                         </div>
                         <div>
                             <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Μηχάνημα: </b> {machine.name + " " + machine.type}</p>
                         </div>
                         <div>
-                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Υπεύθυνος παραγωγής: </b> {machine.variableFiles.partsList.data.productionManager}</p>
+                            <p style={{color:"black",fontSize:"1rem",fontWeight:"normal"}}><b>Υπεύθυνος παραγωγής: </b> {machine.variableFiles[fid].partsList.data.productionManager}</p>
                         </div>
                     </div>
                     <div>
@@ -83,7 +86,7 @@ export default function PartsList(props){
                             <th style={{border:"1px solid black",padding:"1rem"}}>Προμηθευτής</th>
 
                             {
-                                machine.variableFiles.partsList.data.parts.map(p=>{
+                                machine.variableFiles[fid].partsList.data.parts.map(p=>{
                                     return(
                                         <tr>
                                             <td style={{border:"1px solid black",padding:"1rem"}}>{p.name}</td>
@@ -97,8 +100,9 @@ export default function PartsList(props){
                         </table>
                     </div>
                     <div>
-                        <p style={{fontSize:"0.7rem",color:"black",marginTop:"1rem"}}>{"Κωδικός εγγράφου: " +fileCode}</p>
+                    <p style={{fontSize:"0.7rem",color:"black",marginTop:"1rem",wordBreak:"break-all",wordWrap:"break-word"}}>{"Κωδικός εγγράφου: " +fileCode}</p>
                     </div>
+                </div>
                 </div>
                 </>
                 :

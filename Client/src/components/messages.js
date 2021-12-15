@@ -7,6 +7,10 @@ import {getUserMessages,markMessageAsRead} from "../helpers/dataManager"
 import {toaster,Spinner,Heading,Card,Text,Pane,Button} from "evergreen-ui"
 
 
+//Libraries
+import Cookies from "js-cookie"
+
+
 export default function Messages(props){
 
 
@@ -15,7 +19,7 @@ export default function Messages(props){
 
     
     useEffect(()=>{
-        getUserMessages((res)=>{
+        getUserMessages( Cookies.get("authID"),(res)=>{
             if(res.error){
                 toaster.danger(res.error)
                 return
@@ -28,7 +32,7 @@ export default function Messages(props){
 
     return(
         <>
-         <Heading size={900} textAlign="center">Messages</Heading>
+         <Heading size={900} textAlign="center" color="white">Messages</Heading>
          <Pane 
             clearfix  
             width={"100%"}
@@ -57,7 +61,7 @@ export default function Messages(props){
                               flexBasis="0 0 100%"
                               background={m.isRead?"#E6E8F0":"#F9FAFC"}
                               cursor="pointer"
-                              onClick={()=>location.replace("/machines/" + machine._id + "/fileTypes")}>
+                            >
                                 <Text fontWeight="bold">{new Date(m.date).toDateString()}</Text>
                                 <Text>{m.text}</Text>
                                 {

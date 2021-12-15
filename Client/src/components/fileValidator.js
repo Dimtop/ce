@@ -13,9 +13,10 @@ import CryptoJS from "crypto-js"
 export default function FileValidator(props){
     const [fileCode,setFileCode] = useState("")
     const [isValid,setIsValid] = useState("notset")
+    const [decodedData,setDecodedData] = useState({})
 
     useEffect(()=>{
-        var fileCodeFromULR=  new URLSearchParams(window.location.search).get("fc");
+        var fileCodeFromULR = window.location.href.split("=")[1];
         if(fileCodeFromULR){
             setFileCode(fileCodeFromULR)
             validateFile(fileCodeFromULR,(res)=>{
@@ -24,9 +25,13 @@ export default function FileValidator(props){
                     setIsValid(false)
                     return;
                 }
+                console.log(res.data.decodedData)
+                setDecodedData(res.data.decodedData)
                 setIsValid(true);
+
             })
         }
+      
     },[])
 
 
@@ -34,7 +39,7 @@ export default function FileValidator(props){
 
     return(
         <>
-        <Heading size={900} textAlign="center">Επικύρωση γνησιότητας αρχείου</Heading>
+        <Heading size={900} textAlign="center"             color="white">Επικύρωση γνησιότητας αρχείου</Heading>
         <div style={{width:"20rem"}}>
             <TextInputField 
                 label="Κωδικός εγγράφου"
@@ -53,13 +58,23 @@ export default function FileValidator(props){
                         setIsValid(false)
                         return;
                     }
+                    setDecodedData(res.data.decodedData)
                     setIsValid(true);
                 })
             }}>Επικυρωση</Button>
 
             {
                 isValid!="notset"?
-                <h3 style={{color:isValid?"green":"red"}}>{isValid?"Το έγγραφο είναι έγκυρο.":"Το έγγραφο δεν είναι έγκυρο"}</h3>
+                isValid?
+                <>
+                <h3 style={{color:"green"}}>Το έγγραφο είναι έγκυρο.</h3>
+                <p style={{color:'black',fontSize:"1.5rem",fontWeight:"normal"}}><b>Για το μηχάνημα: </b>{decodedData[1] + " " + decodedData[2]}</p>
+                <p style={{color:'black',fontSize:"1.5rem",fontWeight:"normal"}}><b>Με αριθμό σειράς: </b>{decodedData[4]}</p>
+                <p style={{color:'black',fontSize:"1.5rem",fontWeight:"normal"}}><b>Για τον χρήστη: </b>{decodedData[3]}</p>
+                </>
+              
+                :   
+                <h3 style={{color:"red"}}>Το έγγραφο δεν είναι έγκυρο.</h3>
 
                 :
                 <></>

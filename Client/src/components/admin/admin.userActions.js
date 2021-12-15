@@ -5,17 +5,20 @@ import getIDFromURL from "../../helpers/getIDFromURL"
 
 //Componetns
 import {Pane,Card,Text,Heading} from "evergreen-ui"
+import { withRouter } from 'react-router-dom';
 
-export default function AdminUserActions(props){
+export default withRouter(function AdminUserActions(props){
 
 
 
-
+    useEffect(()=>{
+        props.history.push("/admin/users/" +getIDFromURL(window.location.href,"users"))
+    },[])
 
 
     return(
         <>
-        <Heading size={900} textAlign="center">User actions</Heading>
+        <Heading size={900} textAlign="center" color="white">User actions</Heading>
         <Pane 
             clearfix  
             width={"100%"}
@@ -43,7 +46,7 @@ export default function AdminUserActions(props){
                 background="tint1"
                 cursor="pointer"
                 hoverElevation={2}
-                onClick={()=>location.replace("/admin/users/" + getIDFromURL(window.location.href,"users") + "/newMachine")}
+                onClick={()=>location.replace("/admin/users/" + getIDFromURL(window.location.href,"users") + "/machines/new")}
             >
                 <Text>Add new machine</Text>
 
@@ -64,7 +67,7 @@ export default function AdminUserActions(props){
                 background="tint1"
                 cursor="pointer"
                 hoverElevation={2}
-                onClick={()=>location.replace("/machines/" + machine._id + "/fileTypes")}
+                onClick={()=>location.replace("/admin/users/" + getIDFromURL(window.location.href,"users") + "/machines")}
             >
                    <Text>Edit machine files</Text>
 
@@ -85,12 +88,13 @@ export default function AdminUserActions(props){
                 background="tint1"
                 cursor="pointer"
                 hoverElevation={2}
-                onClick={()=>location.replace("/machines/" + machine._id + "/fileTypes")}
+                onClick={()=>location.replace("/admin/users/" + getIDFromURL(window.location.href,"users") + "/data")}
             >
                 <Text>Edit user data</Text>
 
 
             </Card>
+         
             <Card
                 elevation={1}
                 float="left"
@@ -106,7 +110,7 @@ export default function AdminUserActions(props){
                 background="tint1"
                 cursor="pointer"
                 hoverElevation={2}
-                onClick={()=>location.replace("/machines/" + machine._id + "/fileTypes")}
+                onClick={()=>location.replace("/admin/users/" + getIDFromURL(window.location.href,"users") + "/messages")}
             >
                 <Text>Send a message</Text>
 
@@ -119,4 +123,4 @@ export default function AdminUserActions(props){
         </Pane>
         </>
     )
-}
+})

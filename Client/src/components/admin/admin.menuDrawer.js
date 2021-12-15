@@ -31,6 +31,7 @@ export default function AdminMenuDrawer(props){
     return(
         <>
             <SideSheet
+  
                 position={Position.LEFT}
                 isShown={props.showMenu}
                 onCloseComplete={() => props.setShowMenu(false)}
@@ -48,11 +49,12 @@ export default function AdminMenuDrawer(props){
                   flexWrap="wrap"
                 >
                     <Button width="100%" margin={"1rem"} onClick={()=>location.replace("/admin/dashboard")}>Dashboard</Button>
-                    <Button width="100%" margin={"1rem"}>Machines</Button>
-                    <Button width="100%" margin={"1rem"}>Add new user</Button>
+                    <Button width="100%" margin={"1rem"} onClick={()=>location.replace("/admin/categories/new")}>Add new category</Button>
+                    <Button width="100%" margin={"1rem"} onClick={()=>location.replace("/admin/users/new")}>Add new user</Button>
+                    <Button width="100%" margin={"1rem"} onClick={()=>location.replace("/fileValidator")}>Validate a file</Button>
                     <Button appearance="primary" width="100%" margin={"1rem"} onClick={()=>{
                         Cookies.remove("authID")
-                        location.reload()
+                        location.replace("/")
                     }}>Logout</Button>
                 </Pane>
           

@@ -2,6 +2,34 @@
 import Cookies from "js-cookie"
 
 
+
+function createUser(user,cb){
+    var formData = new FormData()
+    formData.append("user",JSON.stringify(user))
+    formData.append("logo",user.logo)
+    formData.append("signature",user.signature)
+   
+    fetch("/api/users",{
+        method:"post",
+
+        body:formData
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+function deleteUser(userID,cb){
+    fetch("/api/users/" + userID,{
+        method:"delete"
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
 function getUserMachines(userID,cb){
     fetch("/api/users/" +userID + "/machines",{
         method:"get"
@@ -109,8 +137,8 @@ function getUserUnreadMessagesCount(cb){
     })
 }
 
-function getUserMessages(cb){
-    fetch("/api/messages/users/" + Cookies.get("authID"),{
+function getUserMessages(userID,cb){
+    fetch("/api/messages/users/" + userID,{
         method:"get"
     })
     .then(res=>res.json())
@@ -167,7 +195,7 @@ function validateFile(fileCode,cb){
 }
 
 
-function generateFileCode(machineID,fileIndicator,cb){
+function generateFileCode(machineID,fid,fileIndicator,cb){
     fetch("/api/machines/generateFileCode",{
         method:"post",
         headers:{
@@ -176,6 +204,7 @@ function generateFileCode(machineID,fileIndicator,cb){
         },
         body:JSON.stringify({
             machineID:machineID,
+            fid:fid,
             fileIndicator:fileIndicator
         })
     })
@@ -208,6 +237,88 @@ function getAllMachineCategories(cb){
     })
 }
 
+function postMachine(machine,cb){
+    fetch("/api/machines/",{
+        method:"post",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            machine:machine
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+function updateMachine(machineID,machine,cb){
+    fetch("/api/machines/"+machineID,{
+        method:"put",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            machine:machine
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+function deleteMachine(machineID,cb){
+    fetch("/api/machines/"+machineID,{
+        method:"delete"
+      
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+function createMessage(message,cb){
+    fetch("/api/messages/",{
+        method:"post",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            message:message
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+function createMachineCategory(category,cb){
+    fetch("/api/machineCategories/",{
+        method:"post",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            category:category
+        })
+    })
+    .then(res=>res.json())
+    .then(res=>{
+        cb(res)
+    })
+}
+
+
+export {createUser}
+export {deleteUser}
 export {getAllMachineCategories}
 export {getAllUsers}
 export {getUserMachines}
@@ -222,3 +333,9 @@ export {markMessageAsRead}
 export { updateMachineFiles}
 export {validateFile}
 export {generateFileCode}
+
+export {postMachine}
+export {createMessage}
+export {createMachineCategory}
+export {updateMachine}
+export {deleteMachine}
